@@ -168,7 +168,13 @@ class AutoReload(object):
 
     def process_python(self, files):
         # process python changes
-        py_files = [i for i in files if i.endswith('.py')]
+
+        # ----------------------------------------------------------------------
+        # '.#' check is for disabling trigger on emacs auto-save
+        py_files = [i for i in files if i.endswith('.py')
+                    and not i.startswith('.#')]
+        # ----------------------------------------------------------------------
+
         py_errors = []
         # TODO keep python errors until they are ok
         if py_files:
@@ -255,7 +261,7 @@ class CommonServer(object):
         sock.close()
 
 
-        class ThreadedServer(CommonServer):
+class ThreadedServer(CommonServer):
     def __init__(self, app):
         super(ThreadedServer, self).__init__(app)
         self.main_thread_id = threading.currentThread().ident
