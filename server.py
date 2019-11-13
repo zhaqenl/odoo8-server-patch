@@ -155,7 +155,7 @@ class AutoReload(object):
         # ----------------------------------------------------------------------
         # '.#' check is for disabling trigger on emacs auto-saved file
         xml_files = [i for i in files if i.endswith('.xml')
-                     and not i.startswith('.#')]
+                     and not os.path.basename(i).startswith('.#')]
         # ----------------------------------------------------------------------
 
         for i in xml_files:
@@ -178,7 +178,7 @@ class AutoReload(object):
         # ----------------------------------------------------------------------
         # '.#' check is for disabling trigger on emacs auto-saved file
         py_files = [i for i in files if i.endswith('.py')
-                    and not i.startswith('.#')]
+                    and not os.path.basename(i).startswith('.#')]
         # ----------------------------------------------------------------------
 
         py_errors = []
