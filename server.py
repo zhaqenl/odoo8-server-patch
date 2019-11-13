@@ -151,7 +151,13 @@ class AutoReload(object):
             self.wm.add_watch(path, mask, rec=True)
 
     def process_data(self, files):
-        xml_files = [i for i in files if i.endswith('.xml')]
+
+        # ----------------------------------------------------------------------
+        # '.#' check is for disabling trigger on emacs auto-saved file
+        xml_files = [i for i in files if i.endswith('.xml')
+                     and not i.startswith('.#')]
+        # ----------------------------------------------------------------------
+
         for i in xml_files:
             for path in openerp.modules.module.ad_paths:
                 if i.startswith(path):
@@ -170,7 +176,7 @@ class AutoReload(object):
         # process python changes
 
         # ----------------------------------------------------------------------
-        # '.#' check is for disabling trigger on emacs auto-save
+        # '.#' check is for disabling trigger on emacs auto-saved file
         py_files = [i for i in files if i.endswith('.py')
                     and not i.startswith('.#')]
         # ----------------------------------------------------------------------
@@ -184,19 +190,6 @@ class AutoReload(object):
                     compile(source, i, 'exec')
                 except SyntaxError:
                     py_errors.append(i)
-                # Add `IOError` handling to check for emacs-generated files
-                # that start with `.#`
-                except IOError:
-                    split_path = i.split("/")
-                    fixed_py_file = split_path[-1][2:]
-                    fixed_split_path = split_path[:-1]
-                    fixed_split_path.append(fixed_py_file)
-                    final_path = "/".join(fixed_split_path)
-                    try:
-                        source = open(final_path, 'rb').read() + '\n'
-                        compile(source, final_path, 'exec')
-                    except SyntaxError:
-                        py_errors.append(final_path)
             if py_errors:
                 _logger.info('autoreload: python code change detected, errors found')
                 for i in py_errors:
